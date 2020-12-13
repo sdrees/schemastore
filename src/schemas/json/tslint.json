@@ -815,6 +815,41 @@
             }
           ]
         },
+        "file-name-casing": {
+          "description": "Enforces a consistent file naming convention.",
+          "definitions": {
+            "file-name-cases": {
+              "type": "string",
+              "enum": [
+                "camel-case",
+                "pascal-case",
+                "kebab-case",
+                "snake-case"
+              ]
+            }
+          },
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "type": "boolean"
+            },
+            {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/rules/properties/file-name-casing/definitions/file-name-cases"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/definitions/rules/properties/file-name-casing/definitions/file-name-cases"
+                  },
+                  "minProperties": 1
+                }
+              ]
+            }
+          ]
+        },
         "forin": {
           "description": "Requires a `for ... in` statement to be filtered with an `if` statement.",
           "allOf": [
@@ -841,7 +876,30 @@
             "options": {
               "type": "array",
               "items": {
-                "type": "string"
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minLength": 1
+                  }
+                ]
               },
               "minItems": 1,
               "uniqueItems": true
@@ -1195,6 +1253,12 @@
                       },
                       "ignore-pattern": {
                         "type": "string"
+                      },
+                      "check-strings": {
+                        "type": "boolean"
+                      },
+                      "check-regex": {
+                        "type": "boolean"
                       }
                     },
                     "additionalProperties": false
@@ -1264,7 +1328,13 @@
                   "private-constructor",
                   "public-instance-method",
                   "protected-instance-method",
-                  "private-instance-method"
+                  "private-instance-method",
+                  "public-static-accessor",
+                  "protected-static-accessor",
+                  "private-static-accessor",
+                  "public-instance-accessor",
+                  "protected-instance-accessor",
+                  "private-instance-accessor"
                 ]
               },
               "minItems": 1,
@@ -1626,6 +1696,17 @@
         },
         "no-duplicate-imports": {
           "description": "Disallows multiple import statements from the same module.",
+          "definitions": {
+            "options": {
+              "type": "object",
+              "properties": {
+                "allow-namespace-imports": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
           "allOf": [
             {
               "$ref": "#/definitions/rule"
@@ -1634,10 +1715,21 @@
               "items": [
                 {
                   "type": "boolean"
+                },
+                {
+                  "$ref": "#/definitions/rules/properties/no-duplicate-imports/definitions/options"
                 }
               ],
-              "additionalItems": false,
+              "maxItems": 2,
               "properties": {
+                "options": {
+                  "description": "An option value or an array of multiple option values.",
+                  "oneOf": [
+                    {
+                      "$ref": "#/definitions/rules/properties/no-duplicate-imports/definitions/options"
+                    }
+                  ]
+                },
                 "severity": {}
               },
               "additionalProperties": false
@@ -1759,11 +1851,13 @@
               "items": {
                 "type": "string",
                 "enum": [
-                  "allow-empty-catch"
+                  "allow-empty-catch",
+                  "allow-empty-functions"
                 ]
               },
               "minItems": 1,
-              "maxItems": 1
+              "maxItems": 2,
+              "uniqueItems": true
             }
           },
           "allOf": [
@@ -1779,7 +1873,8 @@
               "additionalItems": {
                 "$ref": "#/definitions/rules/properties/no-empty/definitions/options/items"
               },
-              "maxItems": 2,
+              "maxItems": 3,
+              "uniqueItems": true,
               "properties": {
                 "options": {
                   "description": "An option value or an array of multiple option values.",
@@ -1843,15 +1938,20 @@
           "definitions": {
             "options": {
               "type": "array",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "dev",
-                  "optional"
-                ]
-              },
+              "items": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "dev",
+                    "optional"
+                  ]
+                },
+                {
+                  "type": "array"
+                }
+              ],
               "minItems": 0,
-              "maxItems": 2
+              "maxItems": 3
             }
           },
           "allOf": [
@@ -2846,11 +2946,13 @@
                 "type": "string",
                 "enum": [
                   "ignore-case",
-                  "match-declaration-order"
+                  "locale-compare",
+                  "match-declaration-order",
+                  "shorthand-first"
                 ]
               },
               "minItems": 1,
-              "maxItems": 2,
+              "maxItems": 4,
               "uniqueItems": true
             }
           },
@@ -2867,7 +2969,7 @@
               "additionalItems": {
                 "$ref": "#/definitions/rules/properties/object-literal-sort-keys/definitions/options/items"
               },
-              "maxItems": 3,
+              "maxItems": 5,
               "uniqueItems": true,
               "properties": {
                 "options": {
@@ -3045,10 +3147,35 @@
               "items": {
                 "type": "object",
                 "properties": {
+                  "grouped-imports": {
+                    "type": "boolean"
+                  },
+                  "groups": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "match": {
+                          "type": "string"
+                        },
+                        "order": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "match",
+                        "order"
+                      ]
+                    }
+                  },
                   "import-sources-order": {
                     "type": "string",
                     "enum": [
                       "case-insensitive",
+                      "case-insensitive-legacy",
                       "lowercase-first",
                       "lowercase-last",
                       "any"
@@ -3058,9 +3185,17 @@
                     "type": "string",
                     "enum": [
                       "case-insensitive",
+                      "case-insensitive-legacy",
                       "lowercase-first",
                       "lowercase-last",
                       "any"
+                    ]
+                  },
+                  "module-source-path": {
+                    "type": "string",
+                    "enum": [
+                      "full",
+                      "basename"
                     ]
                   }
                 },
@@ -3411,6 +3546,23 @@
             }
           ]
         },
+        "prefer-while": {
+          "description": "Prefer while loops instead of for loops without an initializer and incrementor.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/rule"
+            },
+            {
+              "items": [
+                {
+                  "type": "boolean"
+                }
+              ],
+              "additionalItems": false,
+              "additionalProperties": false
+            }
+          ]
+        },
         "promise-function-async": {
           "description": "Requires any function or method that returns a promise to be marked async.",
           "allOf": [
@@ -3568,7 +3720,7 @@
                 }
               ],
               "minItems": 1,
-              "maxItems": 2
+              "maxItems": 3
             }
           },
           "allOf": [
@@ -3940,23 +4092,7 @@
                   },
                   "esSpecCompliant": {
                     "description": "Option to forbid trailing comma after rest",
-                    "allOf": [
-                      {
-                        "$ref": "#/definitions/rule"
-                      },
-                      {
-                        "items": [
-                          {
-                            "type": "boolean"
-                          }
-                        ],
-                        "additionalItems": false,
-                        "properties": {
-                          "severity": {}
-                        },
-                        "additionalProperties": false
-                      }
-                    ]
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
@@ -4096,6 +4232,7 @@
                 "type": "string",
                 "enum": [
                   "check-format",
+                  "require-const-for-all-caps",
                   "allow-leading-underscore",
                   "allow-trailing-underscore",
                   "allow-pascal-case",
@@ -4104,7 +4241,7 @@
                 ]
               },
               "minItems": 1,
-              "maxItems": 6,
+              "maxItems": 7,
               "uniqueItems": true
             }
           },
@@ -4158,7 +4295,8 @@
                   "check-type",
                   "check-typecast",
                   "check-type-operator",
-                  "check-preblock"
+                  "check-preblock",
+                  "check-postbrace"
                 ],
                 "minItems": 1,
                 "maxItems": 10,
@@ -4553,6 +4691,14 @@
               "items": [
                 {
                   "type": "boolean"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "ignore-rest-args": {
+                      "type": "boolean"
+                    }
+                  }
                 }
               ],
               "additionalItems": false,
@@ -5173,7 +5319,8 @@
                     },
                     {
                       "$ref": "#/definitions/tsRules/properties/prefer-readonly/definitions/options/items"
-                    }]
+                    }
+                  ]
                 },
                 "severity": {}
               },
@@ -5192,12 +5339,15 @@
                   "allow-null-union",
                   "allow-undefined-union",
                   "allow-string",
+                  "allow-enum",
                   "allow-number",
-                  "allow-boolean-or-undefined"
+                  "allow-mix",
+                  "allow-boolean-or-undefined",
+                  "ignore-rhs"
                 ]
               },
               "minItems": 1,
-              "maxItems": 5,
+              "maxItems": 8,
               "uniqueItems": true
             }
           },
@@ -5459,6 +5609,18 @@
               "items": [
                 {
                   "type": "boolean"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "singleLine": {
+                      "type": "string",
+                      "enum": [
+                        "always",
+                        "never"
+                      ]
+                    }
+                  }
                 }
               ],
               "additionalItems": false,
@@ -5559,6 +5721,19 @@
         "none"
       ],
       "default": "error"
+    },
+    "linterOptions": {
+      "description": "Additional linter options.",
+      "type": "object",
+      "properties": {
+        "exclude": {
+          "description": "An array of globs. Any file matching these globs will not be linted. All exclude patterns are relative to the configuration file they were specified in.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "http://json.schemastore.org/bungee-plugin",
+  "$id": "https://json.schemastore.org/bungee-plugin",
   "title": "JSON schema for BungeeCord Plugin YAML",
   "type": "object",
   "additionalProperties": true,
@@ -29,14 +29,14 @@
       "description": "Plugin author.",
       "type": "string"
     },
-    "depend": {
+    "depends": {
       "description": "Plugin hard dependencies.",
       "type": "array",
       "items": {
         "$ref": "#/definitions/plugin-name"
       }
     },
-    "softdepend": {
+    "softdepends": {
       "description": "Plugin soft dependencies.",
       "type": "array",
       "items": {

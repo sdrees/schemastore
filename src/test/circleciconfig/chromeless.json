@@ -1,5 +1,20 @@
 {
-  "version": 2,
+  "version": 2.1,
+  "commands": {
+    "build-image": {
+      "description": "Build Docker image, push to Google Container Registry",
+      "parameters": {
+        "gcloud_service_key": {
+          "type": "string"
+        }
+      },
+      "steps": [
+        {
+          "run": "apk add docker"
+        }
+      ]
+    }
+  },
   "workflows": {
     "version": 2,
     "chromeless": {
@@ -33,8 +48,7 @@
   "codecov": {
     "run": {
       "name": "Codecov",
-      "command":
-        "node_modules/.bin/nyc report --reporter=json && bash <(curl -s https://codecov.io/bash) -f coverage/coverage-final.json"
+      "command": "node_modules/.bin/nyc report --reporter=json && bash <(curl -s https://codecov.io/bash) -f coverage/coverage-final.json"
     }
   },
   "jobs": {
@@ -77,8 +91,12 @@
         {
           "run": {
             "name": "Codecov",
-            "command":
-              "node_modules/.bin/nyc report --reporter=json && bash <(curl -s https://codecov.io/bash) -f coverage/coverage-final.json"
+            "command": "node_modules/.bin/nyc report --reporter=json && bash <(curl -s https://codecov.io/bash) -f coverage/coverage-final.json"
+          }
+        },
+        {
+          "build-image": {
+            "gcloud-service-key": "SERVICE_KEY_STRING"
           }
         }
       ]
@@ -123,8 +141,7 @@
         {
           "run": {
             "name": "Codecov",
-            "command":
-              "node_modules/.bin/nyc report --reporter=json && bash <(curl -s https://codecov.io/bash) -f coverage/coverage-final.json"
+            "command": "node_modules/.bin/nyc report --reporter=json && bash <(curl -s https://codecov.io/bash) -f coverage/coverage-final.json"
           }
         }
       ]
@@ -142,16 +159,19 @@
         },
         {
           "checkout": {
+            "name": "Check out repository",
             "path": "~/chromeless/test"
           }
         },
         {
           "setup_remote_docker": {
+            "name": "Setup docker",
             "version": "17.11.0-ce"
           }
         },
         {
           "restore_cache": {
+            "name": "Restore npm cache",
             "keys": ["npm-cache-{{ checksum \"package-lock.json\" }}"]
           }
         },
@@ -160,6 +180,7 @@
         },
         {
           "save_cache": {
+            "name": "Save npm cache",
             "key": "npm-cache-{{ checksum \"package-lock.json\" }}",
             "paths": ["~/.npm"]
           }

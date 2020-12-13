@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema",
-  "id": "http://xunit.github.io/schema/v2.3/xunit.runner.schema.json",
+  "id": "https://xunit.net/schema/v2.3/xunit.runner.schema.json",
   "title": "xUnit.net Runner Configuration",
   "description": "Configuration file for unit test projects using xUnit.net",
   "type": "object",
@@ -28,7 +28,7 @@
     "maxParallelThreads": {
       "description": "Configures the maximum number of threads to be used when parallelizing tests within this assembly.",
       "type": "integer",
-      "minimum": -1
+      "minimum": 1
     },
     "methodDisplay": {
       "description": "Configures the default display name for test cases. If you choose 'method', the display name will be just the method (without the class name); if you choose 'classAndMethod', the default display name will be the fully qualified class name and method name.",

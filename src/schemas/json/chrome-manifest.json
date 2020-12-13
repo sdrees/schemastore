@@ -1,4 +1,4 @@
-﻿{
+{
   "title": "JSON schema for Google Chrome extension manifest files",
   "$schema": "http://json-schema.org/draft-04/schema#",
 
@@ -256,7 +256,7 @@
     "incognito": {
       "type": "string",
       "description": "Specify how this extension will behave if allowed to run in incognito mode.",
-      "enum": [ "spanning", "split" ],
+      "enum": [ "spanning", "split", "not_allowed" ],
       "default": "spanning"
     },
 
